@@ -9,22 +9,45 @@ export default function Home() {
   const { image, loading, uploadImage, response } = useUploadImage();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [advice, setAdvice] = useState<string | null>(null);
+  const [query, setQuery] = useState<string>(
+    'give me information on guava diseases'
+  );
+
+  // Function to fetch advice from your API
+  const fetchAdvice = async (query: string) => {
+    const response = await fetch(
+      'https://farmerchat.farmstack.co/opensource-be/api/chat/get_answer_for_text_query/',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email_id: 'vwadhwa@ucdavis.edu',
+          query: query,
+        }),
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return data; // Adjust this according to the actual response structure
+    } else {
+      throw new Error('Failed to fetch advice');
+    }
+  };
 
   const handleSubmit = async () => {
     if (selectedFile) {
       await uploadImage(selectedFile);
+      const adviceResponseDigiGreen = await fetchAdvice(query);
+      console.log('adviceResponseDigiGreen', adviceResponseDigiGreen);
 
       if (response) {
-        const res = await fetch('http://localhost:3000/api/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ condition: response }),
-        });
-        const data = await res.json();
-        console.log('data', data);
-        setAdvice(data.advice);
+        setQuery(query + response);
+        setAdvice(adviceResponseDigiGreen.response);
+        console.log('response', response);
+        console.log('advice', advice);
       }
     }
   };
