@@ -1,15 +1,17 @@
+// ImageUploader.tsx
 import React, { useRef } from 'react';
-import Image from 'next/image';
-import useUploadImage from './hooks/useUploadImage';
 
-export default function ImageUploader() {
-  const { uploadImage, image, loading } = useUploadImage();
+interface ImageUploaderProps {
+  onFileSelected: (file: File) => void;
+}
+
+export default function ImageUploader({ onFileSelected }: ImageUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      uploadImage(file);
+      onFileSelected(file);
     }
   };
 
@@ -21,8 +23,6 @@ export default function ImageUploader() {
         ref={fileInputRef}
         accept="image/*"
       />
-      {loading && <p>Loading...</p>}
-      {image && <Image src={image} alt="Uploaded" />}
     </main>
   );
 }
